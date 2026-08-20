@@ -14,14 +14,12 @@
     --positive-bg:#f1fff6; --positive-text:#00a634;
     --negative-text:#e5484d;
     --navy:#002452; --slate:#2b3543; --violet:#6355e0;
-    /* App-wide background wash — reverted to the EXACT literal Figma value, no more
-       hand-tuned lightening. Confirmed identical across three independent node
-       fetches this session (89:4634, 89:4636, 507:29767) — this is the real spec,
-       not an approximation: rgb(249,249,251)/rgb(237,235,245)/rgb(212,204,229)/
-       rgb(158,148,184)/rgb(77,71,107) at 0/25/50/75/100%. My several earlier
-       "lighten it more" passes were guesses that drifted away from this — if it
-       still reads as too dark, the base gradient itself is no longer the cause. */
-    --page-gradient: linear-gradient(180deg, #F9F9FB 0%, #EDEBF5 25%, #D4CCE5 50%, #9E94B8 75%, #4D476B 100%);
+    /* App-wide background wash — Mary wants this visibly lighter than the literal
+       Figma spec (F9F9FB/EDEBF5/D4CCE5/9E94B8/4D476B), confirmed and asked for again
+       after seeing the exact-spec version — so this is now a deliberate, explicit
+       departure from spec, not a fetch. Keep this note so it's clear WHY it no
+       longer matches the Figma hex values verbatim. */
+    --page-gradient: linear-gradient(180deg, #FDFDFE 0%, #FAF9FC 25%, #F3F1F8 50%, #E4E0ED 75%, #C7C2D9 100%);
   }
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none;}
   html,body{margin:0;padding:0;}
@@ -428,7 +426,10 @@
   .issuance-text .t{ color:#fff; font-size:16px; font-weight:500; margin:0;}
   .issuance-text .d{ color:#9b9b9b; font-size:14px; margin:4px 0 0; line-height:20px;}
   .topup-cta{ display:inline-flex; margin-top:8px; border:1px solid rgba(255,255,255,.18); border-radius:100px; padding:8px 14px; color:#fff; font-size:14px; font-weight:500; cursor:pointer;}
-  .apply-btn{ height:56px; border-radius:100px; background:var(--navy); color:#fff; border:none; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; width:100%;}
+  /* Was flat navy (var(--navy)) — Mary: "fix all the blue buttons, change to purple
+     gradient". This is the app's primary CTA class (Save/Confirm/Apply/Done/etc.
+     across nearly every screen), so changing it here covers all of them at once. */
+  .apply-btn{ height:56px; border-radius:100px; background:linear-gradient(173.51deg, #A663FF 3.37%, #300071 95.79%); color:#fff; border:none; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; width:100%;}
   .apply-btn:disabled{ opacity:.3; cursor:not-allowed;}
   .apply-btn.outline{ background:#fff; border:1.5px solid var(--negative-text); color:var(--negative-text);}
 
@@ -445,11 +446,19 @@
   .ready-amt{ font-size:30px; font-weight:600; text-align:center; margin:0;}
   .ready-link{ font-size:14px; color:var(--navy); font-weight:500; cursor:pointer; margin-top:-4px;}
   .wallet-btn{ width:100%; height:56px; border-radius:100px; display:flex; align-items:center; justify-content:center; gap:8px; font-size:16px; font-weight:500; cursor:pointer; border:none; font-family:inherit; flex:none;}
-  .wallet-btn.apple{ background:var(--navy); color:#fff;}
+  .wallet-btn.apple{ background:linear-gradient(173.51deg, #A663FF 3.37%, #300071 95.79%); color:#fff;}
   .wallet-btn.google{ background:#fff; border:1px solid var(--outline); color:var(--text-main);}
   .wallet-btn.outline{ background:#fff; border:1.5px solid var(--negative-text); color:var(--negative-text);}
   .g-badge{ width:20px;height:20px;border-radius:100px; background:#4285f4; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700;}
-  .maybe-later{ font-size:14px; font-weight:500; color:var(--text-secondary); cursor:pointer; padding:6px;}
+  /* Was var(--text-secondary) (flat grey) — Mary: "all our text buttons are light",
+     matching the purple-muted secondary-text tone (#492871) used everywhere else in
+     this redesign (Home/Crypto/Card single tx-sub, labels, etc.) instead of the
+     app's old neutral grey. Tried plain white first (matching card-ready's one-off
+     override) but that only worked there because it sits low, in the gradient's
+     darker stretch — on lighter screens like Confirm money it went nearly invisible,
+     so this needed a tone that reads on light AND dark backgrounds, not literal
+     white. */
+  .maybe-later{ font-size:14px; font-weight:500; color:#492871; cursor:pointer; padding:6px;}
 
   /* ---- Card ready / "Add to Wallet" success screen — Figma node 507:29767
      ("Telegram Bot" file). Real card face (same .cs-card as Card Single, via
@@ -569,7 +578,7 @@
   .move-usd{ font-size:14px; color:var(--text-secondary); margin:0;}
   .move-arrow{ display:flex; align-items:center; justify-content:center;}
   .move-arrow .circ{ width:32px;height:32px; border-radius:100px; border:1px solid var(--outline); background:var(--bg-muted); display:flex; align-items:center; justify-content:center; color:var(--text-secondary);}
-  .move-continue{ height:56px; border-radius:100px; background:var(--navy); color:#fff; border:none; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; width:100%; margin-top:auto;}
+  .move-continue{ height:56px; border-radius:100px; background:linear-gradient(173.51deg, #A663FF 3.37%, #300071 95.79%); color:#fff; border:none; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; width:100%; margin-top:auto;}
   .move-continue:disabled{ opacity:.3; cursor:not-allowed;}
 
   /* ---------- Crypto section ---------- */
@@ -687,7 +696,11 @@
   .name-input-wrap input:focus{ outline:none; border-color:#b9c3cf;}
   .add-wallet-hint{ text-align:center; font-size:13px; color:var(--text-secondary); margin:0; line-height:18px;}
 
-  .detail-row{ display:flex; justify-content:space-between; align-items:center; padding:13px 0; border-bottom:1px solid var(--outline); font-size:14.5px;}
+  /* padding was 13px 0 — zero horizontal inset, so text ran flush against the white
+     card's own edges wherever a .detail-row wasn't manually given side padding
+     inline (e.g. the JS-rendered From/To/Rate rows on Confirm money movement).
+     14px matches the sites that already had it set by hand. */
+  .detail-row{ display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-bottom:1px solid var(--outline); font-size:14.5px;}
   .detail-row:last-child{ border-bottom:none;}
   .detail-row span:first-child{ color:var(--text-secondary);}
   .detail-row .mono{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px;}
@@ -837,7 +850,7 @@
   .modal-sheet input{ height:48px; border:1px solid var(--outline); border-radius:10px; background:#fff; padding:0 16px; font-size:15px; font-family:inherit; width:100%; margin-bottom:12px;}
   .modal-sheet .hint{ font-size:13px; color:var(--text-secondary); margin:-8px 0 12px;}
   .modal-sheet .hint.err{ color:#be1002;}
-  .modal-primary{ width:100%; height:52px; border-radius:100px; background:var(--navy); color:#fff; border:none; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;}
+  .modal-primary{ width:100%; height:52px; border-radius:100px; background:linear-gradient(173.51deg, #A663FF 3.37%, #300071 95.79%); color:#fff; border:none; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;}
   .modal-primary.danger{ background:var(--negative-text);}
 
   .more-menu{ position:absolute; top:56px; right:20px; background:#fff; border:1px solid var(--outline); border-radius:14px; box-shadow:0 8px 24px -8px rgba(20,20,20,.25); z-index:250; min-width:150px; padding:6px;}
