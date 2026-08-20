@@ -298,9 +298,15 @@
   #scr-card-single .balance-card.iscard{ height:220px; background:transparent; }
   #scr-card-single .card-pagi .pg{ background:#b399d6; }
   #scr-card-single .card-pagi .pg.active{ background:#410098; }
+  /* backface-visibility:hidden here too, not just on the ancestor .flip-face.front —
+     when this face sits inside Card details' 3D flip card, a nested overflow:hidden
+     box like this one is a known engine quirk that can defeat the parent's own
+     backface culling, so the front face's mirrored content bled through on the
+     "back" of the card instead of the real stripe/CVV face (Mary, screenshot). */
   .cs-card{ position:relative; height:100%; border-radius:20px; overflow:hidden;
     border:1px solid rgba(255,255,255,.28);
     box-shadow:0 18px 40px -4px rgba(8,3,26,.35);
+    backface-visibility:hidden;
   }
   /* Per-card colour variant — the "Card — Active" component in Figma (component set
      found via search_design_system) has several colour variants; the exact node/hex
