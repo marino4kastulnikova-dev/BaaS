@@ -288,11 +288,12 @@
 
   /* ---- Card Single (carousel) redesign — Figma node 89:4060 ("main screen"): vivid
      purple/violet card face with real FLEXIFAI + VISA logo assets and dot-shaped PAN
-     masking. Built as a parallel .cs-card face (used only by renderCardSingle(), via
-     cardSingleFaceHTML()) instead of editing the shared bankCardBig()/.bankcard — that
-     function has 4 other call sites (Card details' PAN-reveal front, Card-ready and
-     Add-to-wallet success screens, plus a dead Home path) that weren't part of this
-     request and stay on the old dark-card look — see note to Mary. */
+     masking. Built as a parallel .cs-card face (cardSingleFaceHTML()) instead of
+     editing the shared bankCardBig()/.bankcard. cardSingleFaceHTML() has since been
+     reused by Card details' front face and Card-ready (see renderCardDetails() /
+     renderReadyCard() below) so those show the same per-card colour variant instead
+     of always the same flat dark card — bankCardBig() now only remains in use for
+     the Add-to-wallet-from-menu screen and a dead Home path. */
   #scr-card-single .balance-zone{ padding:20px 20px 0; }
   #scr-card-single .balance-card.iscard{ height:220px; background:transparent; }
   #scr-card-single .card-pagi .pg{ background:#b399d6; }
@@ -2189,7 +2190,7 @@
     if(card.name === 'Business trip') return ' v-blue';
     return '';
   }
-  function cardSingleFaceHTML(card){
+  function cardSingleFaceHTML(card, numAction){
     var dotGroup = '<div class="cs-dotgrp"><span class="cs-dot"></span><span class="cs-dot"></span><span class="cs-dot"></span><span class="cs-dot"></span></div>';
     return '<div class="cs-card'+cardSingleVariantClass(card)+(card && card.locked ? ' locked' : '')+'">' +
       (card && card.locked ? '<div class="lock-flag">'+LOCK_SVG+'</div>' : '') +
@@ -2197,7 +2198,7 @@
       '<div class="cs-rule cs-rule-h1"></div><div class="cs-rule cs-rule-h2"></div><div class="cs-rule cs-rule-v"></div>' +
       '<div class="cs-inner">' +
         '<div class="cs-header">'+FLEXIFAI_LOGO_SVG+'<span class="cs-pill">Virtual</span></div>' +
-        '<div class="cs-numrow"><div class="cs-dotwrap">'+dotGroup+dotGroup+dotGroup+'</div><span class="cs-num">'+(card?card.last4:'4242')+'</span></div>' +
+        '<div class="cs-numrow"'+(numAction ? ' data-action="'+numAction+'" style="cursor:pointer;"' : '')+'><div class="cs-dotwrap">'+dotGroup+dotGroup+dotGroup+'</div><span class="cs-num">'+(card?card.last4:'4242')+'</span></div>' +
         '<div class="cs-bottomrow"><span class="cs-holder">Cardholder Name</span>'+VISA_LOGO_SVG+'</div>' +
       '</div>' +
     '</div>';
@@ -3113,8 +3114,13 @@
   function renderCardDetails(){
     var card = currentCard();
     if(!card) return;
-    var maskedPan = '•••• •••• •••• '+card.last4;
-    document.getElementById('cardFrontFace').innerHTML = bankCardBig(card, maskedPan, 'Virtual', 'reveal-card-number');
+    // Front face now reuses Card Single's real card visual (cardSingleFaceHTML) so it
+    // shows the same purple/pink/blue variant you tapped in for — was bankCardBig(),
+    // the old flat-dark design, which always looked identical regardless of which
+    // card you came from (Mary: "whatever card design we came from, that's what
+    // should show here"). numAction wires up the same long-press-to-reveal-PAN flow,
+    // now driving the dot→digit swap in doRevealCardNumber() below.
+    document.getElementById('cardFrontFace').innerHTML = cardSingleFaceHTML(card, 'reveal-card-number');
     document.getElementById('cardFlip').classList.remove('flipped');
     document.getElementById('lockTitle').textContent = card.locked ? 'Unlock card' : 'Lock card';
     document.getElementById('lockDesc').textContent = card.locked ? 'Tap to unlock and resume payments' : 'While locked, payments, withdrawals and subscriptions on this card will be blocked';
@@ -3135,13 +3141,17 @@
     withCardPin(function(){ doRevealCardNumber(card); });
   }
   function doRevealCardNumber(card){
-    var numEl = document.getElementById('cardFrontFace').querySelector('.num');
-    if(!numEl) return;
+    // New card face masks with dot groups (.cs-dotwrap), not a plain "••••" text
+    // node — reveal swaps each 4-dot group for the real 4-digit group instead of
+    // replacing a single .num text run.
+    var row = document.getElementById('cardFrontFace').querySelector('.cs-numrow');
+    var dots = document.getElementById('cardFrontFace').querySelector('.cs-dotwrap');
+    if(!row || !dots) return;
+    dots.innerHTML = '<span class="cs-num">4242</span><span class="cs-num">4242</span><span class="cs-num">4242</span>';
+    row.removeAttribute('data-action');
+    row.style.cursor = '';
     var fullPan = '4242 4242 4242 '+card.last4;
-    numEl.textContent = fullPan;
-    numEl.removeAttribute('data-action');
-    numEl.style.cursor = '';
-    attachLongPressCopy(numEl, fullPan.replace(/\s/g,''), 'Card number');
+    attachLongPressCopy(row, fullPan.replace(/\s/g,''), 'Card number');
   }
   function flipCard(){
     var card = currentCard();
