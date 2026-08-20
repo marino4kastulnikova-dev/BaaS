@@ -126,8 +126,17 @@
   /* ---- Home screen redesign — light theme, sourced via Figma MCP from
      "Design system BaaS", node 89:4634 ("main screen") — exact colors/spacing
      pulled from get_design_context, not eyeballed. ---- */
+  /* FOUND THE REAL BUG behind every "background still dark" report: this ID-scoped
+     rule (higher specificity than `.screen{background:var(--page-gradient)}`) was
+     hardcoded to the old literal Figma stops and silently overrode every lighten
+     pass made to --page-gradient — Home never actually received any of them, which
+     is exactly why Crypto (no such override) kept improving while Home didn't.
+     Replaced with the dedicated "bg-light" background token (node 23:2497, Design
+     System file) per Mary's link — same idea as --page-gradient but this is the
+     actual named design-system swatch, and scoped to Home only since Crypto's
+     current wash was confirmed good and shouldn't change. */
   #scr-home{
-    background:linear-gradient(180deg, #F9F9FB 0%, #EDEBF5 25%, #D4CCE5 50%, #9E94B8 75%, #4D476B 100%);
+    background:linear-gradient(180deg, #F9F9FB 0%, #EDEBF5 25%, #D4CCE5 53.347%, #AAA0C4 74.352%, #5B557A 100%);
     background-repeat:no-repeat;
   }
   /* Glass style, from Figma "Top Bar" component (node 3:778, effect style "glass":
